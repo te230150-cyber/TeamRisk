@@ -5,52 +5,62 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClient;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
 import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.net.Proxy;
+import java.net.InetSocketAddress;
 
 @Component
 public class GeminiApiClient {
 
     private final RestClient restClient;
 
+    // プロキシを作成
+    Proxy proxy = new Proxy(
+        Proxy.Type.HTTP,
+        new InetSocketAddress("172.17.0.2", 80)
+    );
+
+    // HTTP通信にプロキシを適用
+        SimpleClientHttpRequestFactory factory =
+        new SimpleClientHttpRequestFactory();
+
+        factory.setProxy(proxy);
+
     @Value("${gemini.api.key}")
     private String apiKey;
 
-    // 無料版で利用できる最新のFlashモデル
-    private static final String MODEL_NAME = "gemini-2.5-flash";
+    // モデル名
+    private static final String MODEL_NAME = "gemini-3.8-flash";
 
-    // application.properties からプロキシ設定を読み込む（プロキシ不要な環境では空欄等で調整可能）
-    public GeminiApiClient(
-            RestClient.Builder restClientBuilder,
-            @Value("${app.proxy.host:}") String proxyHost,
-            @Value("${app.proxy.port:0}") int proxyPort) {
-
-        // プロキシが設定されている場合は ClientHttpRequestFactory に適用する
-        if (proxyHost != null && !proxyHost.isBlank() && proxyPort > 0) {
-            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
-            SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-            requestFactory.setProxy(proxy);
-            restClientBuilder.requestFactory(requestFactory);
-        }
-
+    public GeminiApiClient(RestClient.Builder restClientBuilder) {
         this.restClient = restClientBuilder
                 .baseUrl("https://generativelanguage.googleapis.com/v1beta")
                 .defaultHeader("Content-Type", "application/json")
+                .requestFactory(factory)
                 .build();
     }
 
     /**
      * 日本語のプロンプトと画像データをGemini APIへ送信する
+     * 
+     * @param prompt     日本語の指示や質問プロンプト
+     * @param imageBytes 送信する画像のバイト配列（PNGやJPEGなど）
+     * @param mimeType   画像のMIMEタイプ（例: "image/jpeg", "image/png"）
+     * @return APIからのレスポンス（JSON文字列）
      */
     public String sendImageAndPromptToGemini(String prompt, byte[] imageBytes, String mimeType) {
         try {
+            // 1. 画像をBase64エンコード
             String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 
+            // 2. 型安全にMapを構築（Null安全警告やunchecked conversionを回避）
             Map<String, Object> inlineData = new HashMap<>();
             inlineData.put("mime_type", mimeType);
             inlineData.put("data", base64Image);
@@ -64,16 +74,10 @@ public class GeminiApiClient {
             Map<String, Object> content = new HashMap<>();
             content.put("parts", List.of(textPart, inlineDataPart));
 
-            Map<String, Object> thinkingConfig = new HashMap<>();
-            thinkingConfig.put("thinkingLevel", "xhigh");
-
-            Map<String, Object> generationConfig = new HashMap<>();
-            generationConfig.put("thinkingConfig", thinkingConfig);
-
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("contents", List.of(content));
-            requestBody.put("generationConfig", generationConfig);
 
+            // 3. APIリクエストの送信
             return restClient.post()
                     .uri(uriBuilder -> uriBuilder
                             .path("/models/{model}:generateContent")

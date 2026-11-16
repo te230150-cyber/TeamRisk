@@ -91,20 +91,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <!-- ▼ ここから追加・編集する ▼ -->
-                <configuration>
-                    <jvmArguments>
-                        -Dhttp.proxyHost=172.17.0.2
-                        -Dhttp.proxyPort=80
-                        -Dhttps.proxyHost=172.17.0.2
-                        -Dhttps.proxyPort=80
-                    </jvmArguments>
-                </configuration>
-            <!-- ▲ ここまで ▲ -->
-            </plugin>
         </plugins>
     </build>
 
