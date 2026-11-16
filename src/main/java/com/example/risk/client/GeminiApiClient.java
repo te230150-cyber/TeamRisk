@@ -6,16 +6,14 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
 @Component
-public class ApiClient {
+public class GeminiApiClient {
 
     private final RestClient restClient;
 
-    // application.properties等からAPIキーを注入する想定の設計
     @Value("${gemini.api.key}")
     private String apiKey;
 
-    public ApiClient(RestClient.Builder restClientBuilder) {
-        // Gemini APIのベースURLと共通ヘッダーの設定
+    public GeminiApiClient(RestClient.Builder restClientBuilder) {
         this.restClient = restClientBuilder
                 .baseUrl("https://generativelanguage.googleapis.com/v1beta")
                 .defaultHeader("Content-Type", "application/json")
@@ -23,14 +21,13 @@ public class ApiClient {
     }
 
     /**
-     * 画像データを含むリクエストオブジェクトを受け取り、Gemini APIへ送信して接続・応答取得のみを行う
+     * Gemini APIへリクエストを送信し、通信と応答取得のみを行う
      * 
-     * @param requestBody Gemini APIの仕様に合わせたリクエストDTO（画像やプロンプトを含む）
-     * @return Gemini APIからのレスポンス文字列（またはJSONオブジェクト）
+     * @param requestBody Gemini APIへの送信データ（オブジェクト）
+     * @return APIからのレスポンス（JSON文字列）
      */
     public String sendImageToGemini(Object requestBody) {
         try {
-            // HTTPS通信によるAPI呼び出し
             return restClient.post()
                     .uri(uriBuilder -> uriBuilder
                             .path("/models/gemini-1.5-flash:generateContent")
@@ -38,10 +35,9 @@ public class ApiClient {
                             .build())
                     .body(requestBody)
                     .retrieve()
-                    .body(String.class); // 通信結果のJSONをそのまま文字列として受け取る
+                    .body(String.class);
                     
         } catch (RestClientException e) {
-            // 通信エラーやタイムアウトなどのハンドリング
             throw new RuntimeException("Google Gemini APIとの通信に失敗しました。", e);
         }
     }
