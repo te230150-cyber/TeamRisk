@@ -5,41 +5,36 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestClient;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
 import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.net.Proxy;
-import java.net.InetSocketAddress;
 
 @Component
 public class GeminiApiClient {
 
     private final RestClient restClient;
 
-    // プロキシを作成
-    Proxy proxy = new Proxy(
-        Proxy.Type.HTTP,
-        new InetSocketAddress("172.17.0.2", 80)
-    );
-
-    // HTTP通信にプロキシを適用
-        SimpleClientHttpRequestFactory factory =
-        new SimpleClientHttpRequestFactory();
-
-        factory.setProxy(proxy);
-
     @Value("${gemini.api.key}")
     private String apiKey;
 
-    // モデル名
-    private static final String MODEL_NAME = "gemini-3.8-flash";
+    // 最新のFlashモデル
+    private static final String MODEL_NAME = "gemini-3.5-flash-lite";
 
     public GeminiApiClient(RestClient.Builder restClientBuilder) {
+        // プロキシ設定（学校の環境に合わせてIPやポートを変更してください）
+        Proxy proxy = new Proxy(
+            Proxy.Type.HTTP,
+            new InetSocketAddress("172.17.0.2", 80)
+        );
+
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setProxy(proxy);
+
+        // コンストラクタ内でRestClientにプロキシを適用してビルド
         this.restClient = restClientBuilder
                 .baseUrl("https://generativelanguage.googleapis.com/v1beta")
                 .defaultHeader("Content-Type", "application/json")
@@ -60,7 +55,7 @@ public class GeminiApiClient {
             // 1. 画像をBase64エンコード
             String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 
-            // 2. 型安全にMapを構築（Null安全警告やunchecked conversionを回避）
+            // 2. 型安全にMapを構築
             Map<String, Object> inlineData = new HashMap<>();
             inlineData.put("mime_type", mimeType);
             inlineData.put("data", base64Image);
