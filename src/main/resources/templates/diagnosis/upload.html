@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>フォトリスク - 画像アップロード</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic&family=WDXL+Lubrifont+JP+N&display=swap" rel="stylesheet">
+</head>
+
+<body style="background-color: #bee0c2;">
+
+    <!-- ヘッダー -->
+    <header class="bg-subtle p-3" style="background-color: #618e34;">
+        <span class="fw-bold" style="color: #bde695; font-family: WDXL Lubrifont JP N, sans-serif; font-weight: 400; font-style: normal; font-size: 32px;">フォトリスク</span>
+    </header>
+
+
+    <a th:href="@{/}"
+    class="d-inline-block fs-4 fw-bold text-success text-decoration-none ms-4 mt-3">
+        
+    ← TOPへ戻る
+    </a>
+
+    <!-- メイン -->
+    <main class="container d-flex flex-column justify-content-center align-items-center"
+          style="min-height: calc(100vh - 60px);">
+
+        <form th:action="@{/diagnosis/start}"
+              th:object="${diagnosisform}"
+              method="post"
+              enctype="multipart/form-data"
+              style="width: 450px;"
+              class="d-flex flex-column align-items-center gap-4 w-100">
+
+            <!-- 画像選択 -->
+            <div class="w-100 text-center p-5 rounded"
+                 style="max-width: 450px; background-color: #FFF8E7;">
+
+                <label for="imageFile" class="form-label fw-bold">
+                    画像をアップロード
+                </label>
+
+                <input type="file"
+                       id="imageFile"
+                       name="image"
+                       class="form-control mt-3"
+                       style="width: 350px;"
+                       accept="image/jpeg,image/png"
+                       required>
+            </div>
+
+            <!-- 画像プレビュー -->
+            <div class="text-center mt-3">
+                <img id="preview"
+                     class="img-fluid rounded"
+                     alt="選択した画像のプレビュー"
+                     style="max-height: 300px; display: none;">
+            </div>
+
+            <!-- 診断ボタン -->
+            <button type="submit"
+                    id="diagnosisButton"
+                    class="btn px-5 py-3 fw-bold"
+                    style="background-color: #FFF8E7;"
+                    disabled>
+                診断
+            </button>
+
+        </form>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        const imageFile = document.getElementById("imageFile");
+        const preview = document.getElementById("preview");
+        const button = document.getElementById("diagnosisButton");
+
+        let previewUrl = null;
+
+        // 画像選択時の処理
+        imageFile.addEventListener("change", function () {
+            const file = this.files[0];
+
+            // 前回のプレビューURLを解放
+            if (previewUrl) {
+                URL.revokeObjectURL(previewUrl);
+                previewUrl = null;
+            }
+
+            // 画像が選択されていない場合
+            if (!file) {
+                preview.style.display = "none";
+                preview.removeAttribute("src");
+                button.disabled = true;
+                return;
+            }
+
+            // JPEG・PNG以外は受け付けない
+            if (!["image/jpeg", "image/png"].includes(file.type)) {
+                alert("JPEGまたはPNG形式の画像を選択してください。");
+                imageFile.value = "";
+                preview.style.display = "none";
+                preview.removeAttribute("src");
+                button.disabled = true;
+                return;
+            }
+
+            // 選択した画像をプレビュー表示
+            previewUrl = URL.createObjectURL(file);
+            preview.src = previewUrl;
+            preview.style.display = "block";
+
+            // 診断ボタンを有効化
+            button.disabled = false;
+        });
+    </script>
+
+</body>
+</html>
