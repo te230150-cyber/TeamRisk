@@ -34,9 +34,7 @@
           style="min-height: calc(100vh - 60px);">
 
         <form th:action="@{/diagnosis/start}"
-              th:object="${diagnosisform}"
               method="post"
-              enctype="multipart/form-data"
               style="width: 450px;"
               class="d-flex flex-column align-items-center gap-4 w-100">
 
@@ -78,7 +76,7 @@
     </main>
 
     <!-- JavaScript -->
-    <script>
+    <script th:inline="javascript">
         const imageFile = document.getElementById("imageFile");
         const preview = document.getElementById("preview");
         const button = document.getElementById("diagnosisButton");
@@ -113,13 +111,33 @@
                 return;
             }
 
-            // 選択した画像をプレビュー表示
-            previewUrl = URL.createObjectURL(file);
-            preview.src = previewUrl;
-            preview.style.display = "block";
-
-            // 診断ボタンを有効化
-            button.disabled = false;
+            const formdata = new FormData();
+            formdata.append("image",file)
+            fetch("/upload",
+                {
+                    method:"POST",
+                    body:formdata
+                }
+            )
+            .then(response => {
+                if(!response.ok){
+                    throw new Error("通信失敗");
+                }
+                return response.json;
+            })
+            .then(data =>{
+                
+                if(data.status == "OK"){
+                    previewUrl = URL.createObjectURL(file);
+                    preview.src = previewUrl;
+                    preview.style.display = "block";
+    
+                    // 診断ボタンを有効化
+                    button.disabled = false;   
+                }else{
+                    alert("アップロード処理に失敗しました。");
+                }
+            })
         });
     </script>
 

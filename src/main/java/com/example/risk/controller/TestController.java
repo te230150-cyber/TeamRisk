@@ -1,6 +1,8 @@
 package com.example.risk.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -49,20 +51,20 @@ public class TestController {
     //画像アップロード処理
     @PostMapping("/upload")
     @ResponseBody
-    public ResponseEntity<Void> upload(
+    public Map<String, Object> upload(
         @ModelAttribute DiagnosisForm form,
         HttpSession session) throws IOException {
 
-    MultipartFile file = form.getImage();
+        MultipartFile file = form.getImage();
+        
+        Map<String, Object> response = new HashMap<>();
 
-    if (file == null || file.isEmpty()) {
-        return ResponseEntity.badRequest().build();
+        response.put("status",true);
+        response.put("message","アップロード成功");
+        
+        
+        return response;
     }
-
-    session.setAttribute("imageData", file.getBytes());
-
-    return ResponseEntity.ok().build();
-}
 
     //診断処理
     @PostMapping("/diagnosis/start")
