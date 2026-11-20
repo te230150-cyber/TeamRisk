@@ -4,20 +4,17 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
+//import org.springframework.web.multipart.MultipartFile;
 
 import com.example.risk.model.DiagnosisForm;
 
 import jakarta.servlet.http.HttpSession;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -49,13 +46,13 @@ public class TestController {
     
     
     //画像アップロード処理
-    @PostMapping("/upload")
+    @PostMapping("diagnosis/upload")
     @ResponseBody
     public Map<String, Object> upload(
         @ModelAttribute DiagnosisForm form,
         HttpSession session) throws IOException {
 
-        MultipartFile file = form.getImage();
+        //MultipartFile file = form.getImage();
         
         Map<String, Object> response = new HashMap<>();
 

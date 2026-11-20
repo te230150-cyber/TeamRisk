@@ -16,7 +16,6 @@
 </head>
 
 <body style="background-color: #bee0c2;">
-
     <!-- ヘッダー -->
     <header class="bg-subtle p-3" style="background-color: #618e34;">
         <span class="fw-bold" style="color: #bde695; font-family: WDXL Lubrifont JP N, sans-serif; font-weight: 400; font-style: normal; font-size: 32px;">フォトリスク</span>
@@ -112,8 +111,9 @@
             }
 
             const formdata = new FormData();
+            const url = "/diagnosis/upload"
             formdata.append("image",file)
-            fetch("/upload",
+            fetch(url,
                 {
                     method:"POST",
                     body:formdata
@@ -123,11 +123,11 @@
                 if(!response.ok){
                     throw new Error("通信失敗");
                 }
-                return response.json;
+                return response.json();
             })
             .then(data =>{
                 
-                if(data.status == "OK"){
+                if(data.status){
                     previewUrl = URL.createObjectURL(file);
                     preview.src = previewUrl;
                     preview.style.display = "block";
