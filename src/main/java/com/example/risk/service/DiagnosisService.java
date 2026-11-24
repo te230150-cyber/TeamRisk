@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -85,16 +84,17 @@ public class DiagnosisService {
         }
     }
 
+    private static final long MAX_IMAGE_BYTES = 10L * 1024 * 1024; // 10MB
+
     private void validateInput(DiagnosisForm form, byte[] imageBytes, String mimeType) {
         if (imageBytes == null || imageBytes.length == 0) {
             throw new IllegalArgumentException("診断対象の画像を選択してください。");
         }
         if (!"image/jpeg".equals(mimeType) && !"image/png".equals(mimeType)) {
-            throw new IllegalArgumentException("JPEGまたはPNG形式の画像を選択してください。"); // 設計書 7.3.2[cite: 8]
+            throw new IllegalArgumentException("JPEGまたはPNG形式の画像を選択してください。");
         }
-        long maxBytes = Duration.ofMegabytes(10).toBytes();
-        if (imageBytes.length > maxBytes) {
-            throw new IllegalArgumentException("10MB以下の画像を選択してください。"); // 設計書 7.3.2[cite: 8]
+        if (imageBytes.length > MAX_IMAGE_BYTES) {
+        throw new IllegalArgumentException("10MB以下の画像を選択してください。");
         }
     }
 

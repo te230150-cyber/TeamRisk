@@ -2,6 +2,9 @@ package com.example.risk.model;
 
 import java.util.List;
 
+import lombok.Data;
+
+@Data 
 public class DiagnosisResult {
     private String estimationStatus;    // 判定結果 ("判定可能" または "推定困難")
     private String estimatedLocation;   // 推定場所（都道府県・市区町村など）

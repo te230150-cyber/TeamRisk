@@ -55,7 +55,7 @@ public class LearningModeService {
         data.setPostTestScore(score);
         session.setAttribute(SESSION_KEY_LEARNING, data);
     }
-
+ 
     /**
      * テスト結果比較画面（SC008）向けのセッションデータを取得する[cite: 8]
      */
