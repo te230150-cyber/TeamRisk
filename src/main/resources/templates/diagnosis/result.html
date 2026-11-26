@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>フォトリスク - 診断結果</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic&family=WDXL+Lubrifont+JP+N&display=swap" rel="stylesheet">
+
+    <style>
+        body { background-color: #bee0c2; font-family: 'BIZ UDPGothic', sans-serif; }
+        .site-header { background-color: #618e34; }
+        .site-title { color: #bde695; font-family: 'WDXL Lubrifont JP N', sans-serif; font-size: 32px; }
+        .result-card { background-color: #FFF8E7; }
+        .main-color { color: #286B70; }
+        .btn-main { background-color: #286B70; color: #FFF8E7; }
+        .btn-main:hover { background-color: #1d5155; color: #FFF8E7; }
+    </style>
+</head>
+<body>
+    <header class="site-header p-3">
+        <span class="site-title">フォトリスク</span>
+    </header>
+
+    <main class="container py-4">
+        <h1 class="h3 fw-bold main-color mb-4">診断結果</h1>
+
+        <!-- PNG/PDFに保存する範囲 -->
+        <div id="exportArea" class="p-2">
+            <div class="row g-4 mb-4">
+                <!-- 診断画像 -->
+                <section class="col-12 col-md-6">
+                    <div class="result-card rounded-3 p-4 h-100 shadow-sm">
+                        <h2 class="h5 fw-bold main-color mb-3">診断画像</h2>
+                        <img th:if="${imageUrl != null}"
+                             th:src="${imageUrl}" alt="診断対象の画像"
+                             class="img-fluid rounded d-block mx-auto"
+                             style="max-height: 280px; object-fit: contain;">
+                        <p th:unless="${imageUrl != null}" class="text-secondary mb-0">画像がありません。</p>
+                    </div>
+                </section>
+
+                <!-- 判定結果 -->
+                <section class="col-12 col-md-6">
+                    <div class="result-card rounded-3 p-4 h-100 shadow-sm">
+                        <h2 class="h5 fw-bold main-color mb-3">判定結果</h2>
+                        <div class="d-flex justify-content-around align-items-center gap-3">
+                            <div class="text-center">
+                                <div class="fs-2 fw-bold" th:text="${score != null ? score : '―'}">8</div>
+                                <div>点</div>
+                            </div>
+                            <div class="text-center">
+                                <span class="display-3 fw-bold"
+                                      th:classappend="${rank == 'A'} ? ' text-danger' : (${rank == 'B'} ? ' text-warning' : ' text-success')"
+                                      th:text="${rank != null ? rank : '―'}">A</span>
+                                <span class="fs-5">ランク</span>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-center"
+                           th:if="${rank == 'A'}">危険：位置特定につながる情報が多く含まれています。</p>
+                        <p class="mt-3 mb-0 text-center"
+                           th:if="${rank == 'B'}">やや警戒：位置特定につながる情報が含まれています。</p>
+                        <p class="mt-3 mb-0 text-center"
+                           th:if="${rank == 'C'}">比較的安全：検出された位置特定リスクは低めです。</p>
+                    </div>
+                </section>
+            </div>
+
+            <div class="row g-4">
+                <!-- 推定撮影場所 -->
+                <section class="col-12 col-md-6">
+                    <div class="result-card rounded-3 p-4 h-100 shadow-sm">
+                        <h2 class="h5 fw-bold main-color mb-3">推定撮影場所</h2>
+                        <p class="fs-5 mb-0"
+                           th:text="${estimatedLocation != null and !#strings.isEmpty(estimatedLocation) ? estimatedLocation : '推定困難'}">宮城県仙台市</p>
+                    </div>
+                </section>
+
+                <!-- 検出されたリスク -->
+                <section class="col-12 col-md-6">
+                    <div class="result-card rounded-3 p-4 h-100 shadow-sm">
+                        <h2 class="h5 fw-bold main-color mb-3">検出されたリスク</h2>
+                        <ul class="list-group list-group-flush" th:if="${risks != null and !#lists.isEmpty(risks)}">
+                            <li class="list-group-item bg-transparent px-0"
+                                th:each="risk : ${risks}" th:text="${risk}">駅名が写っています</li>
+                        </ul>
+                        <p class="mb-0" th:if="${risks == null or #lists.isEmpty(risks)}">検出されたリスクはありません。</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- 操作ボタン（出力対象外） -->
+        <div class="d-flex flex-wrap justify-content-end gap-3 mt-4">
+            <button type="button" class="btn btn-main px-4 py-2" onclick="exportPdf()">PDF出力</button>
+            <button type="button" class="btn btn-main px-4 py-2" onclick="exportPng()">PNG出力</button>
+            <a th:if="${mode == 'learning'}" th:href="@{/quiz/post}"
+               class="btn btn-main px-4 py-2">利用後テストへ</a>
+            <a th:href="@{/}" class="btn btn-outline-success px-4 py-2">TOP</a>
+        </div>
+    </main>
+
+    <!-- PDF・PNG出力だけJavaScriptを使用 -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+    <script>
+        async function captureResult() {
+            const area = document.getElementById('exportArea');
+            return html2canvas(area, { backgroundColor: '#bee0c2', scale: 2, useCORS: true });
+        }
+
+        async function exportPng() {
+            try {
+                const canvas = await captureResult();
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = 'photorisk-result.png';
+                link.click();
+            } catch (error) {
+                console.error(error);
+                alert('PNGの出力に失敗しました。');
+            }
+        }
+
+        async function exportPdf() {
+            try {
+                const canvas = await captureResult();
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const margin = 10;
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const imageWidth = pageWidth - margin * 2;
+                const imageHeight = canvas.height * imageWidth / canvas.width;
+                const pageContentHeight = pageHeight - margin * 2;
+                const imageData = canvas.toDataURL('image/png');
+                let offset = 0;
+                do {
+                    if (offset > 0) pdf.addPage();
+                    pdf.addImage(imageData, 'PNG', margin, margin - offset, imageWidth, imageHeight);
+                    offset += pageContentHeight;
+                } while (offset < imageHeight);
+                pdf.save('photorisk-result.pdf');
+            } catch (error) {
+                console.error(error);
+                alert('PDFの出力に失敗しました。');
+            }
+        }
+    </script>
+</body>
+</html>

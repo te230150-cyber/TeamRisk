@@ -4,17 +4,20 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-//import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.risk.model.DiagnosisForm;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -25,10 +28,10 @@ public class TestController {
     @GetMapping("/")
     public String showTop(Model model) {
         model.addAttribute("diagnosisform",new DiagnosisForm());
-        return "top";
+        return "/diagnosis/result";
     }
     //画像アップロード画面
-    @GetMapping("/diagnosis/upload")
+    @GetMapping("/diagnosis/top")
     public String showUpload(Model model) {
         model.addAttribute("diagnosisform",new DiagnosisForm());
         return "diagnosis/upload";
@@ -53,7 +56,7 @@ public class TestController {
         HttpSession session) throws IOException {
 
         //MultipartFile file = form.getImage();
-        
+
         Map<String, Object> response = new HashMap<>();
 
         response.put("status",true);
@@ -61,7 +64,7 @@ public class TestController {
         
         
         return response;
-    }
+}
 
     //診断処理
     @PostMapping("/diagnosis/start")
