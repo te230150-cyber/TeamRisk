@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>フォトリスク - エラー</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic&family=WDXL+Lubrifont+JP+N&display=swap"
+          rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #bee0c2;
+            font-family: 'BIZ UDPGothic', sans-serif;
+        }
+
+        .main-color {
+            color: #286B70;
+        }
+
+        .btn-main {
+            background-color: #286B70;
+            color: #FFF8E7;
+        }
+
+        .btn-main:hover {
+            background-color: #1d5155;
+            color: #FFF8E7;
+        }
+
+        .error-icon {
+            width: 120px;
+            height: 120px;
+            font-size: 80px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container min-vh-100 d-flex flex-column
+                 justify-content-center align-items-center
+                 text-center gap-4 py-5">
+
+        <!-- エラーマーク -->
+        <div class="error-icon bg-danger text-white rounded-circle
+                    d-flex justify-content-center align-items-center
+                    fw-bold"
+             aria-hidden="true">
+            !
+        </div>
+
+        <!-- エラーメッセージ -->
+        <h1 class="h2 fw-bold main-color mb-0">
+            エラーが発生しました
+        </h1>
+
+        <!-- TOPへ戻るボタン -->
+        <a th:href="@{/}"
+           class="btn btn-main px-5 py-3 fs-5 mt-4">
+            TOPへ戻る
+        </a>
+
+    </main>
+
+</body>
+</html>

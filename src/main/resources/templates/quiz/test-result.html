@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>フォトリスク - テスト結果</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic&family=WDXL+Lubrifont+JP+N&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #bee0c2;
+            font-family: 'BIZ UDPGothic', sans-serif;
+        }
+
+        .site-header {
+            background-color: #618e34;
+        }
+
+        .site-title {
+            color: #bde695;
+            font-family: 'WDXL Lubrifont JP N', sans-serif;
+            font-size: 32px;
+        }
+
+        .content-card {
+            background-color: #FFF8E7;
+        }
+
+        .main-color {
+            color: #286B70;
+        }
+
+        .btn-main {
+            background-color: #286B70;
+            color: #FFF8E7;
+        }
+
+        .btn-main:hover {
+            background-color: #1d5155;
+            color: #FFF8E7;
+        }
+
+        .score-title {
+            font-size: 24px;
+        }
+
+        .score-value {
+            font-size: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ヘッダー -->
+    <header class="site-header p-3">
+        <span class="site-title">フォトリスク</span>
+    </header>
+
+    <main class="container py-4">
+
+        <!-- 画面タイトル -->
+        <h1 class="h3 fw-bold main-color mb-4">
+            テスト結果
+        </h1>
+
+        <div class="row g-4">
+
+            <!-- 点数表示 -->
+            <section class="col-12 col-md-4">
+
+                <div class="d-flex flex-column gap-4 h-100">
+
+                    <!-- 診断前の点数 -->
+                    <div class="content-card rounded-3 p-4
+                                shadow-sm text-center flex-fill">
+
+                        <h2 class="score-title fw-bold main-color mb-4">
+                            診断前の点数
+                        </h2>
+
+                        <p class="score-value fw-bold mb-0">
+                            <span th:text="${preTestScore}">4</span>
+                            <span>／10</span>
+                        </p>
+
+                    </div>
+
+                    <!-- 診断後の点数 -->
+                    <div class="content-card rounded-3 p-4
+                                shadow-sm text-center flex-fill">
+
+                        <h2 class="score-title fw-bold main-color mb-4">
+                            診断後の点数
+                        </h2>
+
+                        <p class="score-value fw-bold mb-0">
+                            <span th:text="${postTestScore}">8</span>
+                            <span>／10</span>
+                        </p>
+
+                    </div>
+
+                    <!-- TOPボタン -->
+                    <form th:action="@{/quiz/finish}" method="post" class="text-center">
+
+                        <button type="submit" class="btn btn-main px-5 py-3">
+                            TOPへ戻る
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </section>
+
+            <!-- 回答結果一覧 -->
+            <section class="col-12 col-md-8">
+
+                <div class="content-card rounded-3 p-4 shadow-sm">
+
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered
+                                      align-middle text-center mb-0">
+
+                            <thead class="table-success">
+                                <tr>
+                                    <th scope="col">No.</th>
+                                    <th scope="col">あなたの回答</th>
+                                    <th scope="col">正解</th>
+                                    <th scope="col">判定</th>
+                                </tr>
+                            </thead>
+
+                            <!-- 利用前テスト結果 -->
+                            <tbody>
+
+                                <tr class="table-success">
+                                    <th colspan="4" class="text-start">
+                                        利用前テスト
+                                    </th>
+                                </tr>
+
+                                <tr th:each="result, stat : ${preTestResult}">
+
+                                    <td th:text="${stat.count}">
+                                        1
+                                    </td>
+
+                                    <td th:text="${result.userAnswer}">
+                                        特定できない
+                                    </td>
+
+                                    <td th:text="${result.correctAnswer}">
+                                        地区まで特定
+                                    </td>
+
+                                    <td class="fw-bold fs-5" th:classappend="${result.correct}
+                                            ? 'text-success'
+                                            : 'text-danger'" th:text="${result.correct}
+                                            ? '○' : '×'">
+                                        ×
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                            <!-- 利用後テスト結果 -->
+                            <tbody>
+
+                                <tr class="table-success">
+                                    <th colspan="4" class="text-start">
+                                        利用後テスト
+                                    </th>
+                                </tr>
+
+                                <tr th:each="result, stat : ${postTestResult}">
+
+                                    <td th:text="${stat.count + 5}">
+                                        6
+                                    </td>
+
+                                    <td th:text="${result.userAnswer}">
+                                        特定できない
+                                    </td>
+
+                                    <td th:text="${result.correctAnswer}">
+                                        特定できない
+                                    </td>
+
+                                    <td class="fw-bold fs-5" th:classappend="${result.correct}
+                                            ? 'text-success'
+                                            : 'text-danger'" th:text="${result.correct}
+                                            ? '○' : '×'">
+                                        ○
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

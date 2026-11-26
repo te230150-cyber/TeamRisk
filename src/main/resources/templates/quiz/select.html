@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>フォトリスク - 画像選択</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic&family=WDXL+Lubrifont+JP+N&display=swap"
+          rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #bee0c2;
+            font-family: 'BIZ UDPGothic', sans-serif;
+        }
+
+        .site-header {
+            background-color: #618e34;
+        }
+
+        .site-title {
+            color: #bde695;
+            font-family: 'WDXL Lubrifont JP N', sans-serif;
+            font-size: 32px;
+        }
+
+        .content-card {
+            background-color: #FFF8E7;
+        }
+
+        .main-color {
+            color: #286B70;
+        }
+
+        .btn-main {
+            background-color: #286B70;
+            color: #FFF8E7;
+        }
+
+        .btn-main:hover {
+            background-color: #1d5155;
+            color: #FFF8E7;
+        }
+
+        .btn-main:disabled {
+            background-color: #286B70;
+            color: #FFF8E7;
+            opacity: 0.5;
+        }
+
+        .image-card {
+            cursor: pointer;
+            border: 3px solid transparent;
+        }
+
+        .image-card:hover {
+            border-color: #618e34;
+        }
+
+        .btn-check:checked + .image-card {
+            border-color: #286B70;
+        }
+
+        .btn-check:focus-visible + .image-card {
+            outline: 3px solid #286B70;
+            outline-offset: 2px;
+        }
+
+        .select-image {
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            object-fit: contain;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ヘッダー -->
+    <header class="site-header p-3">
+        <span class="site-title">フォトリスク</span>
+    </header>
+
+    <main class="container py-5">
+
+        <!-- 説明文 -->
+        <h1 class="h4 fw-bold main-color text-center mb-5">
+            診断したい画像を1枚選択してください。
+        </h1>
+
+        <form th:action="@{/quiz/diagnosis/start}" method="post">
+
+            <!-- 画像選択欄 -->
+            <div class="row justify-content-center g-4">
+
+                <!-- 画像一覧 -->
+                <div class="col-12 col-sm-4 col-lg-3"
+                     th:each="image : ${images}">
+
+                    <!-- ラジオボタン -->
+                    <input type="radio"
+                           class="btn-check"
+                           name="selectedImageId"
+                           th:id="|image-${image.id}|"
+                           th:value="${image.id}"
+                           required>
+
+                    <!-- 画像表示 -->
+                    <label th:for="|image-${image.id}|"
+                           class="image-card content-card rounded-3
+                                  p-2 shadow-sm d-block">
+
+                        <img th:src="@{${image.url}}"
+                             th:alt="|診断用画像${image.id}|"
+                             class="select-image rounded">
+
+                    </label>
+
+                    <!-- 選択状態 -->
+                    <p class="selection-status text-center
+                              text-secondary fw-bold mt-3 mb-0">
+                        ○ 未選択
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- 診断開始ボタン -->
+            <div class="text-center mt-5">
+
+                <button type="submit"
+                        id="diagnosisButton"
+                        class="btn btn-main px-5 py-3 fs-5"
+                        disabled>
+                    診断開始
+                </button>
+
+            </div>
+
+        </form>
+
+    </main>
+
+    <!-- 画像選択状態の切り替え -->
+    <script>
+        const images = document.querySelectorAll(
+            'input[name="selectedImageId"]'
+        );
+
+        const diagnosisButton =
+            document.getElementById('diagnosisButton');
+
+        function updateSelection() {
+
+            images.forEach(image => {
+
+                const status = image.parentElement.querySelector(
+                    '.selection-status'
+                );
+
+                if (image.checked) {
+                    status.textContent = '● 選択中';
+                    status.classList.remove('text-secondary');
+                    status.classList.add('main-color');
+                } else {
+                    status.textContent = '○ 未選択';
+                    status.classList.remove('main-color');
+                    status.classList.add('text-secondary');
+                }
+
+            });
+
+            diagnosisButton.disabled =
+                !Array.from(images).some(image => image.checked);
+        }
+
+        images.forEach(image => {
+            image.addEventListener('change', updateSelection);
+        });
+
+        updateSelection();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>フォトリスク - テスト終了</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic&family=WDXL+Lubrifont+JP+N&display=swap"
+          rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #bee0c2;
+            font-family: 'BIZ UDPGothic', sans-serif;
+        }
+
+        .site-header {
+            background-color: #618e34;
+        }
+
+        .site-title {
+            color: #bde695;
+            font-family: 'WDXL Lubrifont JP N', sans-serif;
+            font-size: 32px;
+        }
+
+        .content-card {
+            background-color: #FFF8E7;
+        }
+
+        .main-color {
+            color: #286B70;
+        }
+
+        .btn-main {
+            background-color: #286B70;
+            color: #FFF8E7;
+        }
+
+        .btn-main:hover {
+            background-color: #1d5155;
+            color: #FFF8E7;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ヘッダー -->
+    <header class="site-header p-3">
+        <span class="site-title">フォトリスク</span>
+    </header>
+
+    <main class="container py-5">
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-9">
+
+                <!-- テスト終了通知 -->
+                <h1 class="h2 fw-bold main-color text-center mb-5">
+                    テストが終了しました。
+                </h1>
+
+                <!-- 診断案内 -->
+                <section class="content-card rounded-3 p-4 p-md-5
+                                shadow-sm text-center">
+
+                    <p class="fs-5 mb-3">
+                        次に、画像のリスク診断を行います。
+                    </p>
+
+                    <p class="fs-5 mb-3">
+                        画像を選択し、診断結果を確認してください。
+                    </p>
+
+                    <p class="fs-5 mb-0">
+                        診断結果の確認後、あらたにテストを行います。
+                    </p>
+
+                </section>
+
+                <!-- 画像選択へ進むボタン -->
+                <div class="text-center mt-5">
+
+                    <a th:href="@{/quiz/select}"
+                       class="btn btn-main px-5 py-3 fs-5">
+                        画像選択へ進む
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+</body>
+</html>
